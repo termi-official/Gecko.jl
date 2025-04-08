@@ -1,6 +1,6 @@
 name = "Gecko"
 uuid = "1207f3c9-c989-46bd-b274-f7b835830eca"
-authors = ["termi-official <termi-official@users.noreply.github.com> and contributors"]
+authors = ["Dennis Ogiermann <termi-official@users.noreply.github.com> and contributors"]
 version = "1.0.0-DEV"
 
 [deps]
