@@ -1,0 +1,19 @@
+name = "Gecko"
+uuid = "1207f3c9-c989-46bd-b274-f7b835830eca"
+authors = ["termi-official <termi-official@users.noreply.github.com> and contributors"]
+version = "1.0.0-DEV"
+
+[deps]
+CxxWrap = "1f15a43c-97ca-5a2a-ae31-89f07a497df4"
+gecko_jll = "32aead09-57ab-5c70-a47a-e7c5b594f489"
+
+[compat]
+CxxWrap = "0.16.2"
+gecko_jll = "1.0.1"
+julia = "1.10"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
