@@ -3,8 +3,8 @@
 
 Gecko multilevel graph for linear ordering problems.
 """
-struct GeckoGraph
-    ptr::CxxPtr{LibGecko.Graph}
+struct GeckoGraph{PtrType <: Union{Gecko.LibGecko.GraphAllocated, ConstCxxPtr{Gecko.LibGecko.Graph}, CxxPtr{Gecko.LibGecko.Graph}}}
+    ptr::PtrType
 end
 
 GeckoGraph() = GeckoGraph(LibGecko.Graph())
@@ -13,6 +13,7 @@ function GeckoGraph(nnodes::Integer)
     for _ in 1:nnodes
         add_node!(g)
     end
+    return g
 end
 
 function add_node!(graph::GeckoGraph)
@@ -23,11 +24,18 @@ function add_node!(graph::GeckoGraph, weight::Real)
 end
 
 function add_edge!(graph::GeckoGraph, i::Integer, j::Integer)
-    LibGecko.insert_arc(graph, i, j, 1.f0, 1.f0)
+    LibGecko.insert_arc(graph.ptr, i, j, 1.f0, 1.f0)
+end
+function add_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real)
+    LibGecko.insert_arc(graph.ptr, i, j, Float32(weight), 1.f0)
 end
 function add_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real, bond::Real)
-    LibGecko.insert_arc(graph, i, j, Float32(weight), Float32(bond))
+    LibGecko.insert_arc(graph.ptr, i, j, Float32(weight), Float32(bond))
 end
 
-num_nodes(g::GeckoGraph) = LibGecko.nodes(g.ptr)
-num_edges(g::GeckoGraph) = LibGecko.edges(g.ptr)
+num_nodes(g::GeckoGraph) = Int(LibGecko.nodes(g.ptr))
+num_edges(g::GeckoGraph) = Int(LibGecko.edges(g.ptr))
+
+function new_index(graph::GeckoGraph, old_index::Integer)
+    Int(LibGecko.rank(graph.ptr, old_index)+1)
+end

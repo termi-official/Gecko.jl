@@ -8,7 +8,32 @@
 Julia wrapper for the C++ graph ordering library [Gecko](https://github.com/LLNL/gecko).
 Credits go to the original author [Peter Lindstrom](https://people.llnl.gov/pl) at Lawrence Livermore National Laboratory.
 
-Citing Gecko
+## How to use the library
+
+```julia
+using Gecko
+
+# Graph with 4 nodes
+g = GeckoGraph(4)
+
+# Connect to quadrilateral. Insertion must be sorted by the first node index.
+add_edge!(g, 1, 2)
+add_edge!(g, 1, 3)
+add_edge!(g, 2, 1)
+add_edge!(g, 2, 4)
+add_edge!(g, 3, 1)
+add_edge!(g, 3, 4)
+add_edge!(g, 4, 2)
+add_edge!(g, 4, 3)
+
+# Optimize ordering
+order!(g)
+
+# We can now access the optimized ordering via
+new_index(g, 2 #= old_node_index =#)
+```
+
+## Citing Gecko
 ------------
 
 If you use gecko for scholarly research, please cite the following paper:

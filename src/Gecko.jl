@@ -19,6 +19,9 @@ include("graph.jl")
 include("optimization.jl")
 
 # User-facing API
-export GeckoGraph, add_node!, add_edge!, order!, cost, num_nodes, num_edges
-
+export GeckoGraph, add_node!, add_edge!, order!,
+        cost, num_nodes, num_edges, new_index, GraphOrderingParameters
+export FunctionalQuasiconvex, FunctionalHarmonic, FunctionalGeometric,
+       FunctionalSMR, FunctionalArithmetic, FunctionalRMS, FunctionalMaximum
+    
 end

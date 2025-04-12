@@ -1,7 +1,7 @@
 using Gecko
 using Test
 
-mutable struct TestProgressCallbacks
+mutable struct TestProgressCallbacks <: Gecko.AbstractGeckoLogger
     bo_called::Bool
     eo_called::Bool
     bi_called::Bool
@@ -87,7 +87,7 @@ function grid_test_internal(
     progress = Gecko.LibGecko.JuliaProgressWrapper(state_capsule, Gecko.begin_order, Gecko.end_order, Gecko.begin_iter, Gecko.end_iter, Gecko.begin_phase, Gecko.end_phase, Gecko.quit)
     functional = Gecko.LibGecko.FunctionalGeometric()
     Gecko.LibGecko.order(graph, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress));
-    cost = Gecko.LibGecko.cost(graph)
+    c = Gecko.LibGecko.cost(graph)
 
     @test state_capsule.bo_called == true
     @test state_capsule.eo_called == true
@@ -106,7 +106,7 @@ function grid_test_internal(
     end
 
     epsilon = 1e-2;
-    @test cost ≥ (1.0 + epsilon) * mincost
+    @test c ≥ (1.0 + epsilon) * mincost
 end
 
 @testset "Gecko wrapper internals" begin
@@ -140,16 +140,16 @@ function grid_test_api(
         y = floor(Int, (i - 1) / size)
 
         if (x > 0.)
-            add_edge!(graph, i, i - 1)
+            add_directed_edge!(graph, i, i - 1)
         end
         if (x < size - 1.)
-            add_edge!(graph, i, i + 1)
+            add_directed_edge!(graph, i, i + 1)
         end
         if (y > 0.)
-            add_edge!(graph, i, i - size)
+            add_directed_edge!(graph, i, i - size)
         end
         if (y < size - 1.)
-            add_edge!(graph, i, i + size)
+            add_directed_edge!(graph, i, i + size)
         end
     end
     @test num_nodes(graph) == nodes
@@ -158,8 +158,8 @@ function grid_test_api(
     # order graph
     logger = TestProgressCallbacks()
     functional = FunctionalGeometric()
-    Gecko.order!(graph, OrderingParameters(), logger);
-    cost = Gecko.cost(graph)
+    order!(graph, GraphOrderingParameters(), logger);
+    c = cost(graph)
 
     @test logger.bo_called == true
     @test logger.eo_called == true
@@ -178,7 +178,7 @@ function grid_test_api(
     end
 
     epsilon = 1e-2;
-    @test cost ≥ (1.0 + epsilon) * mincost
+    @test c ≥ (1.0 + epsilon) * mincost
 end
 
 @testset "Gecko user api" begin
@@ -186,7 +186,7 @@ end
 
     @testset "2D grid" begin
         for size in 1:6
-            grid_test_internal(size)
+            grid_test_api(size)
         end
     end
 end
