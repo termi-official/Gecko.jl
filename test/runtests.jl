@@ -1,6 +1,5 @@
 using Gecko
 using Test
-using CxxWrap
 
 mutable struct TestProgressCallbacks
     bo_called::Bool
@@ -13,31 +12,31 @@ mutable struct TestProgressCallbacks
 end
 TestProgressCallbacks() = TestProgressCallbacks(false, false, false, false, false, false, false)
 
-function begin_order(data::TestProgressCallbacks, graph, cost)
+function Gecko.begin_order(data::TestProgressCallbacks, graph, cost)
     data.bo_called = true
     return nothing
 end
-function end_order(data::TestProgressCallbacks, graph, cost)
+function Gecko.end_order(data::TestProgressCallbacks, graph, cost)
     data.eo_called = true
     return nothing
 end
-function begin_iter(data::TestProgressCallbacks, graph, iter, maxiter, window)
+function Gecko.begin_iter(data::TestProgressCallbacks, graph, iter, maxiter, window)
     data.bi_called = true
     return nothing
 end
-function end_iter(data::TestProgressCallbacks, graph, mincost, cost)
+function Gecko.end_iter(data::TestProgressCallbacks, graph, mincost, cost)
     data.ei_called = true
     return nothing
 end
-function begin_phase(data::TestProgressCallbacks, graph, name)
+function Gecko.begin_phase(data::TestProgressCallbacks, graph, name)
     data.bp_called = true
     return nothing
 end
-function end_phase(data::TestProgressCallbacks, graph, show)
+function Gecko.end_phase(data::TestProgressCallbacks, graph, show)
     data.ep_called = true
     return nothing
 end
-function quit(data::TestProgressCallbacks)
+function Gecko.quit(data::TestProgressCallbacks)
     data.q_called = true
     return false
 end
@@ -59,36 +58,36 @@ function grid_test_internal(
     mincost = edges > 0 ? (exp(log(minproduct[size]) / edges)) : 0.0
 
     # construct graph
-    graph = Gecko.Graph()
+    graph = Gecko.LibGecko.Graph()
 
     # insert nodes
     for i in 1:nodes
-        Gecko.insert_node(graph, 1.f0)
+        Gecko.LibGecko.insert_node(graph, 1.f0)
         x = floor(Int, (i - 1) % size)
         y = floor(Int, (i - 1) / size)
 
         if (x > 0.)
-            Gecko.insert_arc(graph, i, i - 1, 1.f0, 1.f9)
+            Gecko.LibGecko.insert_arc(graph, i, i - 1, 1.f0, 1.f0)
         end
         if (x < size - 1.)
-            Gecko.insert_arc(graph, i, i + 1, 1.f0, 1.f9)
+            Gecko.LibGecko.insert_arc(graph, i, i + 1, 1.f0, 1.f0)
         end
         if (y > 0.)
-            Gecko.insert_arc(graph, i, i - size, 1.f0, 1.f9)
+            Gecko.LibGecko.insert_arc(graph, i, i - size, 1.f0, 1.f0)
         end
         if (y < size - 1.)
-            Gecko.insert_arc(graph, i, i + size, 1.f0, 1.f9)
+            Gecko.LibGecko.insert_arc(graph, i, i + size, 1.f0, 1.f0)
         end
     end
-    @test Gecko.nodes(graph) == nodes
-    @test Gecko.edges(graph) == edges
+    @test Gecko.LibGecko.nodes(graph) == nodes
+    @test Gecko.LibGecko.edges(graph) == edges
 
     # order graph
     state_capsule = TestProgressCallbacks()
-    progress = Gecko.JuliaProgressWrapper(state_capsule, begin_order, end_order, begin_iter, end_iter, begin_phase, end_phase, quit)
-    functional = Gecko.FunctionalGeometric()
-    Gecko.order(graph, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress));
-    cost = Gecko.cost(graph)
+    progress = Gecko.LibGecko.JuliaProgressWrapper(state_capsule, Gecko.begin_order, Gecko.end_order, Gecko.begin_iter, Gecko.end_iter, Gecko.begin_phase, Gecko.end_phase, Gecko.quit)
+    functional = Gecko.LibGecko.FunctionalGeometric()
+    Gecko.LibGecko.order(graph, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress));
+    cost = Gecko.LibGecko.cost(graph)
 
     @test state_capsule.bo_called == true
     @test state_capsule.eo_called == true
@@ -111,6 +110,78 @@ function grid_test_internal(
 end
 
 @testset "Gecko wrapper internals" begin
+    maxdims = 5  # number of hypercube dimensions
+
+    @testset "2D grid" begin
+        for size in 1:6
+            grid_test_internal(size)
+        end
+    end
+end
+
+function grid_test_api(
+    size,           # number of nodes along each dimension
+)
+    # known minimal edge products
+    minproduct = [0., 1., 3., 225., 688905., 145904338125., 984582541613671875. ]
+    @test size ≤ sizeof(minproduct) / sizeof(minproduct[1])
+
+    nodes = size * size           # grid node count
+    edges = 2 * size * (size - 1) # grid edge count
+
+    mincost = edges > 0 ? (exp(log(minproduct[size]) / edges)) : 0.0
+
+    # construct graph
+    graph = GeckoGraph(nodes)
+
+    # insert nodes
+    for i in 1:nodes
+        x = floor(Int, (i - 1) % size)
+        y = floor(Int, (i - 1) / size)
+
+        if (x > 0.)
+            add_edge!(graph, i, i - 1)
+        end
+        if (x < size - 1.)
+            add_edge!(graph, i, i + 1)
+        end
+        if (y > 0.)
+            add_edge!(graph, i, i - size)
+        end
+        if (y < size - 1.)
+            add_edge!(graph, i, i + size)
+        end
+    end
+    @test num_nodes(graph) == nodes
+    @test num_edges(graph) == edges
+
+    # order graph
+    logger = TestProgressCallbacks()
+    functional = FunctionalGeometric()
+    Gecko.order!(graph, OrderingParameters(), logger);
+    cost = Gecko.cost(graph)
+
+    @test logger.bo_called == true
+    @test logger.eo_called == true
+    if size > 1
+        @test logger.bi_called == true
+        @test logger.ei_called == true
+        @test logger.bp_called == true
+        @test logger.ep_called == true
+        @test logger.q_called  == true
+    else
+        @test logger.bi_called == false
+        @test logger.ei_called == false
+        @test logger.bp_called == false
+        @test logger.ep_called == false
+        @test logger.q_called  == false
+    end
+
+    epsilon = 1e-2;
+    @test cost ≥ (1.0 + epsilon) * mincost
+end
+
+@testset "Gecko user api" begin
     maxdims = 5  # number of hypercube dimensions
 
     @testset "2D grid" begin
