@@ -16,7 +16,7 @@ function order!(graph::GeckoGraph, params::GraphOrderingParameters = GraphOrderi
     # Generate logger wrapper
     progress_wrapper = LibGecko.JuliaProgressWrapper(logger, internal_begin_order, internal_end_order, internal_begin_iter, internal_end_iter, internal_begin_phase, internal_end_phase, internal_quit)
     # Actual call for ordering algorithm
-    LibGecko.order(graph.ptr, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress_wrapper));
+    GC.@preserve logger progress_wrapper graph functional LibGecko.order(graph.ptr, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress_wrapper));
     return nothing
 end
 

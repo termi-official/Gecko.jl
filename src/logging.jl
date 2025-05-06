@@ -14,10 +14,10 @@ function internal_end_iter(data, graph, mincost, cost)
     return end_iter(data, GeckoGraph(unsafe_load(graph)), mincost, cost)
 end
 function internal_begin_phase(data, graph, name)
-    return begin_phase(data, GeckoGraph(unsafe_load(graph)), name)
+    return begin_phase(data, GeckoGraph(unsafe_load(graph)), unsafe_load(name))
 end
 function internal_end_phase(data, graph, show)
-    return end_phase(data, GeckoGraph(unsafe_load(graph)), show)
+    return end_phase(data, GeckoGraph(unsafe_load(graph)), Bool(show))
 end
 function internal_quit(data)
     return quit(data)
