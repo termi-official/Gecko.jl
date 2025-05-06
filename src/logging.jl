@@ -2,22 +2,22 @@ abstract type AbstractGeckoLogger end
 
 # Remove decorations and redirect to user-facing part
 function internal_begin_order(data, graph, cost)
-    return begin_order(data, GeckoGraph(unsafe_load(graph)), unsafe_load(cost))
+    return begin_order(data, GeckoGraph(unsafe_load(graph)), cost)
 end
 function internal_end_order(data, graph, cost)
-    return end_order(data, GeckoGraph(unsafe_load(graph)), unsafe_load(cost))
+    return end_order(data, GeckoGraph(unsafe_load(graph)), cost)
 end
 function internal_begin_iter(data, graph, iter, maxiter, window)
-    return begin_iter(data, GeckoGraph(unsafe_load(graph)), unsafe_load(iter), unsafe_load(maxiter), unsafe_load(window))
+    return begin_iter(data, GeckoGraph(unsafe_load(graph)), iter, maxiter, window)
 end
 function internal_end_iter(data, graph, mincost, cost)
-    return end_iter(data, GeckoGraph(unsafe_load(graph)), unsafe_load(mincost), unsafe_load(cost))
+    return end_iter(data, GeckoGraph(unsafe_load(graph)), mincost, cost)
 end
 function internal_begin_phase(data, graph, name)
-    return begin_phase(data, GeckoGraph(unsafe_load(graph)), unsafe_load(name))
+    return begin_phase(data, GeckoGraph(unsafe_load(graph)), name)
 end
 function internal_end_phase(data, graph, show)
-    return end_phase(data, GeckoGraph(unsafe_load(graph)), unsafe_load(show))
+    return end_phase(data, GeckoGraph(unsafe_load(graph)), show)
 end
 function internal_quit(data)
     return quit(data)

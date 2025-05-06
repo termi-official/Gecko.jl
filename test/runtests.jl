@@ -112,10 +112,9 @@ end
 @testset "Gecko wrapper internals" begin
     maxdims = 5  # number of hypercube dimensions
 
-    @testset "2D grid" begin
-        for size in 1:6
-            grid_test_internal(size)
-        end
+    @testset "2D grid ($size)" for size in 1:6
+        grid_test_internal(size)
+        GC.gc()
     end
 end
 
@@ -132,6 +131,7 @@ function grid_test_api(
     mincost = edges > 0 ? (exp(log(minproduct[size]) / edges)) : 0.0
 
     # construct graph
+    @info "Constructing GeckoGraph"
     graph = GeckoGraph(nodes)
 
     # insert nodes
@@ -156,9 +156,12 @@ function grid_test_api(
     @test num_edges(graph) == edges
 
     # order graph
+    @info "Setup logger"
     logger = TestProgressCallbacks()
     functional = FunctionalGeometric()
-    order!(graph, GraphOrderingParameters(), logger);
+
+    @info "Ordering..."
+    order!(graph, GraphOrderingParameters(;functional), logger);
     c = cost(graph)
 
     @test logger.bo_called == true
@@ -184,9 +187,8 @@ end
 @testset "Gecko user api" begin
     maxdims = 5  # number of hypercube dimensions
 
-    @testset "2D grid" begin
-        for size in 1:6
-            grid_test_api(size)
-        end
+    @testset "2D grid ($size)" for size in 1:6
+        grid_test_api(size)
+        GC.gc()
     end
 end

@@ -2,8 +2,8 @@
 import .LibGecko: FunctionalQuasiconvex, FunctionalHarmonic, FunctionalGeometric,
     FunctionalSMR, FunctionalArithmetic, FunctionalRMS, FunctionalMaximum
 
-Base.@kwdef struct GraphOrderingParameters
-    functional          = FunctionalGeometric()
+Base.@kwdef struct GraphOrderingParameters{FunType}
+    functional::FunType = FunctionalGeometric()
     iterations::Integer = 9 # number of V cycles
     window::Integer     = 5 # initial window size
     period::Integer     = 2 # iterations between window increment

@@ -23,13 +23,13 @@ function add_node!(graph::GeckoGraph, weight::Real)
     LibGecko.insert_node(graph.ptr, Float32(weight))
 end
 
-function add_edge!(graph::GeckoGraph, i::Integer, j::Integer)
+function add_directed_edge!(graph::GeckoGraph, i::Integer, j::Integer)
     LibGecko.insert_arc(graph.ptr, i, j, 1.f0, 1.f0)
 end
-function add_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real)
+function add_directed_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real)
     LibGecko.insert_arc(graph.ptr, i, j, Float32(weight), 1.f0)
 end
-function add_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real, bond::Real)
+function add_directed_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real, bond::Real)
     LibGecko.insert_arc(graph.ptr, i, j, Float32(weight), Float32(bond))
 end
 
