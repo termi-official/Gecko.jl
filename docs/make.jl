@@ -19,5 +19,10 @@ makedocs(;
 
 deploydocs(;
     repo="github.com/termi-official/Gecko.jl",
-    devbranch="main",
+    # devbranch="main",
+    push_preview=true,
+    versions = [
+        "stable" => "v^",
+        "dev" => "dev"
+    ]
 )
