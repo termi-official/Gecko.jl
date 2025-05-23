@@ -9,7 +9,7 @@ end
 
 GeckoGraph() = GeckoGraph(LibGecko.Graph())
 function GeckoGraph(nnodes::Integer)
-    g = GeckoGraph(LibGecko.Graph())
+    g = GeckoGraph()
     for _ in 1:nnodes
         add_node!(g)
     end
@@ -22,7 +22,7 @@ end
 Add a new node to the graph wth index `num_nodes + 1`.
 """
 function add_node!(graph::GeckoGraph)
-    LibGecko.insert_node(graph.ptr, 1.f0)
+    add_node!(graph, 1.f0)
 end
 function add_node!(graph::GeckoGraph, weight::Real)
     LibGecko.insert_node(graph.ptr, Float32(weight))
@@ -35,10 +35,10 @@ Add a new directed edge to the graph, connecting nodes `i` and `j`.
 Insertion must be sorted by the first node index `i`, i.e. if we insert an edge with `i=3`, then we cannot add an edge with `i=2` afterwards.
 """
 function add_directed_edge!(graph::GeckoGraph, i::Integer, j::Integer)
-    LibGecko.insert_arc(graph.ptr, i, j, 1.f0, 1.f0)
+    add_directed_edge!(graph, i, j, 1.f0)
 end
 function add_directed_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real)
-    LibGecko.insert_arc(graph.ptr, i, j, Float32(weight), 1.f0)
+    add_directed_edge!(graph, i, j, Float32(weight), 1.f0)
 end
 function add_directed_edge!(graph::GeckoGraph, i::Integer, j::Integer, weight::Real, bond::Real)
     LibGecko.insert_arc(graph.ptr, i, j, Float32(weight), Float32(bond))
