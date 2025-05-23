@@ -89,7 +89,7 @@ function grid_test_internal(
     state_capsule = TestProgressCallbacks()
     progress = Gecko.LibGecko.JuliaProgressWrapper(state_capsule, Gecko.begin_order, Gecko.end_order, Gecko.begin_iter, Gecko.end_iter, Gecko.begin_phase, Gecko.end_phase, Gecko.quit)
     functional = Gecko.LibGecko.FunctionalGeometric()
-    GC.@preserve state_capsule progress graph functional Gecko.LibGecko.order(graph, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress));
+    GC.@preserve state_capsule progress graph functional Gecko.LibGecko.order(graph, Gecko.CxxPtr(functional), iterations, window, period, seed, Gecko.CxxPtr(progress))
     c = Gecko.LibGecko.cost(graph)
 
     @test state_capsule.bo_called == true
@@ -108,7 +108,7 @@ function grid_test_internal(
         @test state_capsule.q_called  == false
     end
 
-    epsilon = 1e-2;
+    epsilon = 1e-2
     @test c ≥ (1.0 + epsilon) * mincost
 end
 
@@ -164,7 +164,7 @@ function grid_test_api(
     functional = FunctionalGeometric()
 
     @info "Ordering..."
-    order!(graph, GraphOrderingParameters(;functional), logger);
+    order!(graph, GraphOrderingParameters(;functional), logger)
     c = cost(graph)
 
     @test logger.bo_called == true
@@ -183,7 +183,7 @@ function grid_test_api(
         @test logger.q_called  == false
     end
 
-    epsilon = 1e-2;
+    epsilon = 1e-2
     @test c ≥ (1.0 + epsilon) * mincost
 end
 
@@ -193,5 +193,28 @@ end
     @testset "2D grid ($size)" for size in 1:6
         grid_test_api(size)
         GC.gc()
+    end
+
+    @testset "quad grid" begin
+        zgraph = GeckoGraph(4)
+        add_directed_edge!(zgraph, 1, 2)
+        add_directed_edge!(zgraph, 1, 3)
+        # add_directed_edge!(zgraph, 1, 4)
+        add_directed_edge!(zgraph, 2, 1)
+        # add_directed_edge!(zgraph, 2, 3)
+        add_directed_edge!(zgraph, 2, 4)
+        add_directed_edge!(zgraph, 3, 1)
+        # add_directed_edge!(zgraph, 3, 2)
+        add_directed_edge!(zgraph, 3, 4)
+        # add_directed_edge!(zgraph, 4, 1)
+        add_directed_edge!(zgraph, 4, 2)
+        add_directed_edge!(zgraph, 4, 3)
+        order!(zgraph)
+        GC.gc()
+
+        @test new_index(zgraph, 1) == 3
+        @test new_index(zgraph, 2) == 4
+        @test new_index(zgraph, 3) == 2
+        @test new_index(zgraph, 4) == 1
     end
 end
