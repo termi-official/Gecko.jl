@@ -17,14 +17,14 @@ using Gecko
 g = GeckoGraph(4)
 
 # Connect to quadrilateral. Insertion must be sorted by the first node index.
-add_edge!(g, 1, 2)
-add_edge!(g, 1, 3)
-add_edge!(g, 2, 1)
-add_edge!(g, 2, 4)
-add_edge!(g, 3, 1)
-add_edge!(g, 3, 4)
-add_edge!(g, 4, 2)
-add_edge!(g, 4, 3)
+add_directed_edge!(g, 1, 2)
+add_directed_edge!(g, 1, 3)
+add_directed_edge!(g, 2, 1)
+add_directed_edge!(g, 2, 4)
+add_directed_edge!(g, 3, 1)
+add_directed_edge!(g, 3, 4)
+add_directed_edge!(g, 4, 2)
+add_directed_edge!(g, 4, 3)
 
 # Optimize ordering
 order!(g)
